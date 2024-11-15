@@ -128,7 +128,7 @@ export function authorizer<
                   redirectURI: authorization.redirect_uri,
                   clientID: authorization.client_id,
                 },
-                60,
+                Date.now() / 1000 + 60,
               );
               const location = new URL(authorization.redirect_uri);
               location.searchParams.set("code", code);
