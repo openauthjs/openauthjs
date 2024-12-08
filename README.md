@@ -213,7 +213,7 @@ You now have a centralized auth server. Test it out by visiting `/.well-known/oa
 Since this is a standard OAuth server you can use any libraries for OAuth and it will work. OpenAuth does provide some light tooling for this although even a manual flow is pretty simple. You can create a client like this:
 
 ```ts
-import { createClient } form "@openauthjs/openauth"
+import { createClient } from "@openauthjs/openauth"
 
 const client = createClient("my-client", {
   issuer: "https://auth.myserver.com" // this is the url for your auth server
