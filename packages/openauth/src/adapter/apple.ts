@@ -5,6 +5,7 @@ export function AppleAdapter(config: Oauth2WrappedConfig) {
   return Oauth2Adapter({
     ...config,
     type: "apple",
+    responseMode: "form_post",
     endpoint: {
       authorization: "https://appleid.apple.com/auth/authorize",
       token: "https://appleid.apple.com/auth/token",
