@@ -213,9 +213,13 @@ export function PasswordAdapter(config: PasswordConfig) {
       })
 
       routes.get("/change", async (c) => {
-        const redirect =
+        let redirect =
           c.req.query("redirect_uri") ||
           c.req.url.replace(/change.*/, "authorize")
+        const fowardedHost = c.req.header("x-forwarded-host")
+        if (redirect.includes(".lambda-url.") && fowardedHost) {
+          redirect = `https://${fowardedHost}/password/authorize`
+        }
         const state: PasswordChangeState = {
           type: "start",
           redirect,
