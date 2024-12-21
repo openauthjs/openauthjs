@@ -579,6 +579,64 @@ export function authorizer<
     },
   )
 
+  app.post(
+    "/revoke",
+    cors({
+      origin: "*",
+      allowHeaders: ["*"],
+      allowMethods: ["POST"],
+      credentials: false,
+    }),
+    async (c) => {
+      const form = await c.req.formData()
+
+      const refreshToken = form.get("token")
+      if (!refreshToken)
+        return c.json(
+          {
+            error: "invalid_request",
+            error_description: "Missing refresh_token",
+          },
+          400,
+        )
+      const splits = refreshToken.toString().split(":")
+      const token = splits.pop()!
+      const subject = splits.join(":")
+      const key = ["oauth:refresh", subject, token]
+      const payload = await Storage.get<{
+        type: string
+        properties: any
+        clientID: string
+        ttl: {
+          access: number
+          refresh: number
+        }
+      }>(storage, key)
+      if (!payload) {
+        return c.json(
+          {
+            error: "invalid_request",
+            error_description: "Refresh token not found or expired",
+          },
+          400,
+        )
+      }
+      await Storage.remove(storage, key)
+
+      const all = form.get("revoke_all") === "true"
+      if (all) {
+        for await (const [key] of Storage.scan(storage, [
+          "oauth:refresh",
+          subject,
+        ])) {
+          await Storage.remove(storage, key)
+        }
+      }
+
+      return c.newResponse(null, 200)
+    },
+  )
+
   app.get("/authorize", async (c) => {
     const provider = c.req.query("provider")
     const response_type = c.req.query("response_type")

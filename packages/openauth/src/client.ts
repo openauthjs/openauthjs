@@ -326,6 +326,29 @@ export function createClient(input: ClientInput): Client {
         },
       }
     },
+    async revoke(
+      refresh: string,
+      opts?: {
+        all?: boolean
+      },
+    ): Promise<{ err: false } | { err: InvalidRefreshTokenError }> {
+      const tokens = await f(issuer + "/revoke", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+          token: refresh,
+          revoke_all: opts?.all ? "true" : "false",
+        }).toString(),
+      })
+      if (!tokens.ok) {
+        return {
+          err: new InvalidRefreshTokenError(),
+        }
+      }
+      return { err: false }
+    },
     async verify<T extends SubjectSchema>(
       subjects: T,
       token: string,
