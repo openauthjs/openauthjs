@@ -2,6 +2,17 @@
 
 import { Layout } from "./base.js"
 
+const DEFAULT_COPY = {
+  continue_with: "Continue with",
+  providers: {
+    twitch: "Twitch",
+    google: "Google",
+    github: "GitHub",
+  },
+} satisfies Record<string, any>
+
+export type SelectUICopy = typeof DEFAULT_COPY
+
 export interface SelectProps {
   providers?: Record<
     string,
@@ -10,6 +21,7 @@ export interface SelectProps {
       display?: string
     }
   >
+  copy?: Partial<SelectUICopy>
 }
 
 export function Select(props?: SelectProps) {
@@ -17,6 +29,10 @@ export function Select(props?: SelectProps) {
     providers: Record<string, string>,
     _req: Request,
   ): Promise<Response> => {
+    const copy = {
+      ...DEFAULT_COPY,
+      ...props?.copy,
+    }
     const jsx = (
       <Layout>
         <div data-component="form">
@@ -31,7 +47,8 @@ export function Select(props?: SelectProps) {
                 data-color="ghost"
               >
                 {icon && <i data-slot="icon">{icon}</i>}
-                Continue with {match?.display || DISPLAY[type] || type}
+                {copy.continue_with}{" "}
+                {match?.display || copy.providers[type] || type}
               </a>
             )
           })}
@@ -45,12 +62,6 @@ export function Select(props?: SelectProps) {
       },
     })
   }
-}
-
-const DISPLAY: Record<string, string> = {
-  twitch: "Twitch",
-  google: "Google",
-  github: "GitHub",
 }
 
 const ICON: Record<string, any> = {
