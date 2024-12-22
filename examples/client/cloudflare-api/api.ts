@@ -1,10 +1,11 @@
-import type { Service } from "@cloudflare/workers-types"
+import type { Service, KVNamespace } from "@cloudflare/workers-types"
 import { createClient } from "@openauthjs/openauth/client"
 import { subjects } from "../../subjects"
 
 interface Env {
   OPENAUTH_ISSUER: string
   Auth: Service
+  AuthKV: KVNamespace
   CloudflareAuth: Service
 }
 
@@ -23,6 +24,10 @@ export default {
       case "/callback":
         try {
           const code = url.searchParams.get("code")!
+          const state = url.searchParams.get("state")!
+          const challenge = await env.AuthKV.get(`oauth:challenge ${state}`)
+          if (!challenge) throw new Error("Invalid state")
+          await env.AuthKV.delete(`oauth:challenge ${state}`)
           const exchanged = await client.exchange(code, redirectURI)
           if (exchanged.err) throw new Error("Invalid code")
           const response = new Response(null, { status: 302, headers: {} })
@@ -37,10 +42,11 @@ export default {
           return new Response(e.toString())
         }
       case "/authorize":
-        return Response.redirect(
-          await client.authorize(redirectURI, "code").then((v) => v.url),
-          302,
-        )
+        const { state } = await client.authorize(redirectURI, "code")
+        await env.AuthKV.put(`oauth:challenge ${state}`, "1", {
+          expirationTtl: 60, // in seconds
+        })
+        return Response.redirect(url, 302)
       case "/":
         const cookies = new URLSearchParams(
           request.headers.get("cookie")?.replaceAll("; ", "&"),
