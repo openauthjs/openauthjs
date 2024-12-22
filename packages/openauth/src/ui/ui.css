@@ -15,20 +15,28 @@
     --color-primary: var(--color-primary-light);
   }
 
-  --color-high: oklch(
-    from var(--color-background) calc(round(1 - round(l / 1.4))) 0 0
+  --color-foreground: oklch(
+    from var(--color-background) calc(round(1 - round(l / 1.4, 1), 1)) 0 0
   );
-  --color-low: oklch(from var(--color-background) calc(round(l / 1.4)) 0 0);
-  --lightness-high: color-mix(
-    in oklch,
-    var(--color-high) 0%,
-    oklch(var(--color-high) 0 0)
+
+  --color-primary-foreground: oklch(
+    from var(--color-primary) calc(round(1 - round(l / 1.4, 1), 1)) 0 0
   );
-  --lightness-low: color-mix(
-    in oklch,
-    var(--color-low) 0%,
-    oklch(var(--color-low) 0 0)
+
+  --color-border: oklch(
+    from var(--color-background)
+      calc(clamp(0.22, l + (-0.12 * round(l / 1.4, 1) + 0.06), 0.88)) c h
   );
+  --color-border-focus: oklch(
+    from var(--color-background)
+      calc(clamp(0.3, l + (-0.2 * round(l / 1.4, 1) + 0.1), 0.7)) c h
+  );
+
+  --color-input-background: oklch(
+    from var(--color-background) calc(l + (-0.06 * round(l / 1.4, 1) + 0.03)) c
+      h
+  );
+
   --font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
     "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --font-scale: 1;
@@ -53,11 +61,12 @@
   justify-content: center;
   flex-direction: column;
   user-select: none;
-  color: var(--color-high);
+  color: var(--color-foreground);
 }
 
 [data-component="center"] {
-  width: 380px;
+  width: 100%;
+  max-width: 380px;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -103,23 +112,15 @@
   height: 2.5rem;
   padding: 0 1rem;
   border: 1px solid transparent;
-  --background: oklch(
-    from var(--color-background) calc(l + (-0.06 * round(l / 1.4) + 0.03)) c h
-  );
-  background: var(--background);
-  border-color: oklch(
-    from var(--color-background)
-      calc(clamp(0.22, l + (-0.12 * round(l / 1.4) + 0.06), 0.88)) c h
-  );
+
+  background: var(--color-input-background);
+  border-color: var(--color-border);
   border-radius: calc(var(--border-radius) * 0.25rem);
   font-size: var(--font-size-sm);
   outline: none;
 
   &:focus {
-    border-color: oklch(
-      from var(--color-background)
-        calc(clamp(0.3, l + (-0.2 * round(l / 1.4) + 0.1), 0.7)) c h
-    );
+    border-color: var(--color-border-focus);
   }
 
   &:user-invalid:not(:focus) {
@@ -139,16 +140,12 @@
   align-items: center;
   justify-content: center;
   background: var(--color-primary);
-  color: oklch(from var(--color-primary) calc(round(1 - round(l / 1.4))) 0 0);
+  color: var(--color-primary-foreground);
 
   &[data-color="ghost"] {
     background: transparent;
-    color: var(--color-high);
-    border: 1px solid
-      oklch(
-        from var(--color-background)
-          calc(clamp(0.22, l + (-0.12 * round(l / 1.4) + 0.06), 0.88)) c h
-      );
+    color: var(--color-foreground);
+    border: 1px solid var(--color-border);
   }
 
   [data-slot="icon"] {
