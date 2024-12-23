@@ -304,7 +304,7 @@ export function PasswordAdapter(config: PasswordConfig) {
 }
 
 import * as jose from "jose"
-import { TextEncoder } from "util"
+import { TextEncoder } from "node:util"
 
 interface HashedPassword {}
 
@@ -367,7 +367,7 @@ export function PBKDF2Hasher(opts?: { interations?: number }): PasswordHasher<{
     },
   }
 }
-import { timingSafeEqual, randomBytes, scrypt } from "crypto"
+import { timingSafeEqual, randomBytes, scrypt } from "node:crypto"
 
 export function ScryptHasher(opts?: {
   N?: number

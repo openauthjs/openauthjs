@@ -1,4 +1,4 @@
-import { timingSafeEqual } from "crypto"
+import { timingSafeEqual } from "node:crypto"
 
 export function generateUnbiasedDigits(length: number): string {
   const result: number[] = []
