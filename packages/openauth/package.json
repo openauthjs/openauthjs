@@ -37,7 +37,8 @@
   "dependencies": {
     "@standard-schema/spec": "1.0.0-beta.3",
     "aws4fetch": "1.0.20",
-    "jose": "5.9.6"
+    "jose": "5.9.6",
+    "@node-saml/node-saml": "5.0.0"
   },
   "files": [
     "src",
